@@ -1,0 +1,87 @@
+''' 
+# Tenant from Token 
+#     Teantn has Bucket
+#         Put Item into Bucket 
+
+# Bucket.prepare_new_item():
+#     item   
+
+
+# tenant/bucket/object_id
+# /vms/virtualmachines/1234
+
+# t = tenant_by_name_token(name, token)
+# t.bucket_by_name(name)
+
+# Item =item_for_bucket(item, details)
+# save(item)   
+
+
+# put_item_in_bucket(Bucket, Item)
+
+# /vms/virtualmachines
+
+
+# PUT /ObjectName HTTP/1.1
+# Host: BucketName.s3.amazonaws.com
+# Date: date
+# Authorization: authorization string (see Authenticating Requests (AWS Signature Version
+# 		4))
+from collections import namedtuple
+TenantAccessKey = namedtuple('TenantAccessKey', 'name, access_key')
+TenantName = namedtuple('TenantName', 'name')
+BucketId = namedtuple('BucketId', 'tenant_name, bucket_id')
+
+
+
+
+class TenantService(object):
+    def __init__(self, tenant_repo):
+        self.tenant_repo = tenant_repo
+    
+    def all_tenants(self):
+        for t in self.tenant_repo.tenants():
+            yield t
+
+    def tenant_name_by_access_key(self, TenantAccessKey):
+        tenant = self.tenant_repo.tenant_by_name(name)
+        if not tenant.has_access_key(key):
+            raise AccessKeyNotValidError("The access key '{}' is not valid this tenant".format(access_key))
+        
+        return TenantName(name=tenant.name)
+
+class BucketService(object):
+    def __init__(self,bucket Bucket, bucket_repo : BucketRepository) -> None:
+        self.bucket_repo = bucket_repo
+        self.bucket = bucket
+    
+    def all(self, a_filter=None) -> Generator[Tuple[str, object], None, None]:
+        a_filter = (lambda k, y: True) if a_filter is None else a_filter
+        for key, value in self.bucket_repo.all(self.bucket.id):
+            if a_filter(key, value):
+                yield (key, value)
+
+    def get_item(self, bucket, key) -> object:
+        item = self.bucket_repo.get(self.bucket.id, key)
+        if item is None:
+            raise KeyError("no such key: {0!r}".format(key))
+        else:
+            return item
+
+    def put_item(self, item) -> None:
+        self.bucket_repo.put(self.bucket.id, key, value)
+
+    def remove_item(self, key) -> None:
+        self.bucket_repo.pull(self.bucket.id, key)
+
+class TenantNotValidError(Exception):
+    """Raised when a tenant is invalid"""
+    pass
+
+class AccessKeyNotValidError(Exception):
+    """Raised when a tenant / acess key combination is invalid"""
+    pass
+
+class DuplicateBucketKeyError(Exception):
+    """Raised when a bucket key already exists for a tenant"""
+    pass '''

@@ -1,0 +1,19 @@
+{
+    "python.pythonPath": "c:/Users/scott/Documents/code/bucket/.venv/scripts/python.exe",
+    "python.unitTest.pyTestArgs": [
+        "src"
+    ],
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/CVS": true,
+        "**/.DS_Store": true,
+        "**/__pycache__": true,
+        "**/.cache": true,
+        "**/.venv": true,
+        "**/.vscode": true
+    },
+    "python.unitTest.pyTestEnabled": true,
+    "python.formatting.provider": "autopep8"  
+}
