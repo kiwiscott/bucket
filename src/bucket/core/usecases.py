@@ -2,6 +2,7 @@ from collections import namedtuple
 from .gateways import TenantDataGateway, BucketDataGateway
 from .entities import Tenant
 from . import registry
+from .errors import TenantNotFoundError, AccessKeyNotValidError, BucketItemNotFoundError
 
 # Input output tuples
 TenantAccessKey = namedtuple('TenantAccessKey', 'name, access_key')
@@ -74,9 +75,8 @@ def all_tenants():
         yield(ti)
     return None
 
+
 #@must_be_secured
-
-
 def new_tenant(name):
     tenant = Tenant(name)
     tenant.new_access_key()
@@ -115,23 +115,3 @@ def all_items_in_bucket(bucket):
     for item in registry.BUCKET_DATA_GATEWAY.all_in_bucket(bucket.id):
         bi = BucketItem(bucket.key, item.key, item.data)
         yield(bi)
-
-
-class BucketItemNotFoundError(Exception):
-    """Raised when a bucket item is not found"""
-    pass
-
-
-class TenantNotFoundError(Exception):
-    """Raised when a tenant is invalid"""
-    pass
-
-
-class AccessKeyNotValidError(Exception):
-    """Raised when a tenant / acess key combination is invalid"""
-    pass
-
-
-class DuplicateBucketKeyError(Exception):
-    """Raised when a bucket key already exists for a tenant"""
-    pass

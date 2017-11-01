@@ -1,6 +1,8 @@
 import uuid
 import base64
 import datetime
+from .errors import BucketItemNotFoundError, DuplicateBucketKeyError
+
 
 class Item(object):
     """
@@ -8,7 +10,8 @@ class Item(object):
     Any subsequent update of the column resets the TTL to the TTL specified in the update. 
     By default, values never expire.
     """
-    def __init__(self, bucket_id, key, data, changed = None,  ttl_seconds = None):
+
+    def __init__(self, bucket_id, key, data, changed=None,  ttl_seconds=None):
         assert key is not None and data is not None, \
             "key and data must not be None"
 
@@ -17,19 +20,22 @@ class Item(object):
         self.data = data
         self.ttl_seconds = ttl_seconds
         self.changed = changed if changed else datetime.datetime.utcnow()
-    
+
+
 class Bucket(object):
     """
     A bucket represents a holder for items. The actual items are associated to the bucket
     not stored within the bucket
     """
+
     def __init__(self, key, id):
         self.key = key
         self.id = id
-    
-    def prepare_item(self,key, data, created = None,  ttl_seconds = None):
+
+    def prepare_item(self, key, data, created=None,  ttl_seconds=None):
         i = Item(self.id, key, data, created, ttl_seconds)
-        return i 
+        return i
+
 
 class Tenant(object):
     def __init__(self, name):
@@ -48,29 +54,22 @@ class Tenant(object):
     def has_bucket(self, key):
         return key in self.buckets
 
-    def get_bucket(self,key):
+    def get_bucket(self, key):
         if key not in self.buckets:
-            raise BucketDoesNotExistError("A bucket named '{}' does not exist for this tenant".format(key))
+            raise BucketItemNotFoundError(
+                "A bucket named '{}' does not exist for this tenant".format(key))
         return self.buckets[key]
 
     def new_bucket(self, key):
         if key in self.buckets:
-            raise DuplicateBucketKeyError("A bucket named '{}' already exists for this tenant".format(key))
-        
+            raise DuplicateBucketKeyError(
+                "A bucket named '{}' already exists for this tenant".format(key))
+
         id = _generate_psuedo_random_key()
         bucket = Bucket(key, id)
 
         self.buckets[key] = bucket
         return bucket
-
-class BucketDoesNotExistError(Exception):
-    """Raised when a bucket key doesnt exist for a tenant"""
-    pass
-
-class DuplicateBucketKeyError(Exception):
-    """Raised when a bucket key already exists for a tenant"""
-    pass
-
 
 
 def _generate_psuedo_random_key():

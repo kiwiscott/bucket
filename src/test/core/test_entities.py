@@ -1,5 +1,6 @@
 import pytest
-from bucket.core.entities import Bucket, Tenant, DuplicateBucketKeyError, BucketDoesNotExistError
+from bucket.core.entities import Bucket, Tenant
+from bucket.core.errors import DuplicateBucketKeyError, BucketItemNotFoundError
 from datetime import datetime, timedelta
 
 class TestBucket(object):
@@ -82,7 +83,7 @@ class TestTenant(object):
 
     def test_get_bucket_errors(self):
         tenant = Tenant('scott')
-        with pytest.raises(BucketDoesNotExistError) as excinfo:
+        with pytest.raises(BucketItemNotFoundError) as excinfo:
             tenant.get_bucket('default')
 
         assert str(
