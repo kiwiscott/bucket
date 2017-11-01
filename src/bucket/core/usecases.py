@@ -2,9 +2,11 @@ from collections import namedtuple
 from .gateways import TenantDataGateway, BucketDataGateway
 from .entities import Tenant
 from . import registry
+
 # Input output tuples
 TenantAccessKey = namedtuple('TenantAccessKey', 'name, access_key')
-BucketAccessKey = namedtuple('BucketAccessKey', 'tenant_name, access_key, bucket')
+BucketAccessKey = namedtuple(
+    'BucketAccessKey', 'tenant_name, access_key, bucket')
 TenantName = namedtuple('TenantName', 'name')
 TenantInfo = namedtuple('TenantName', 'name, access_keys, buckets')
 BucketItem = namedtuple('BucketItem', 'bucket_name key data')
