@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 import pytest
 
 from bucket.core.entities import Tenant
-from bucket.usecases import *
+from bucket.usecase import *
 from .util import MockTenantData, build_tenant
 from bucket.core import registry
 
