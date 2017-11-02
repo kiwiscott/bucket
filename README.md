@@ -16,3 +16,9 @@ Code design wide this project implements full end to end coverage:
 ![Alt text](/doc/arch.png)
 
 Using this architecture approach is different from using django where the framework drives the strcuture of the code. In this case the core application depends on no frameworks. Adding the rest api components is acase of choosing a light weight web framework that solves only that problem. Additionally designed the cassandra gateway is purly based on the recommended structure of cassandra - a nosql datastore without joins. 
+
+
+##code
+![Alt text](/doc/tenant-bucket-item.png)
+
+The domain is fairly simple. Tenants are assigned access key. They use these access keys to create buckets. Once the tenant has a bucket they can start adding and removing items from the buckets. The items in the buckets are designed to be a stream of bytes.

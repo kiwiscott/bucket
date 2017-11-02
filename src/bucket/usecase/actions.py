@@ -1,16 +1,16 @@
 from bucket.core import registry
 from bucket.core.entities import Tenant
-
+from typing import Generator
 from bucket.core .errors import (AccessKeyNotValidError, BucketItemNotFoundError,
-                     TenantNotFoundError)
+                                 TenantNotFoundError)
 from .security import access_key_and_tenant_required, access_to_bucket_required
 from .tuples import (BucketAccessKey, BucketItem, BucketItemKey, ItemInfo,
                      TenantAccessKey, TenantInfo)
 
 
-
 #@must_be_secured
-def new_tenant(name):
+def new_tenant(name: str) -> TenantInfo:
+    """create a new tenant"""
     tenant = Tenant(name)
     tenant.new_access_key()
     registry.TENANT_DATA_GATEWAY.save(tenant)
@@ -21,7 +21,8 @@ def new_tenant(name):
     return ti
 
 #@must_be_secured
-def all_tenants():
+def all_tenants() -> Generator[TenantInfo, None, None]:
+    """get all tenants"""
     for tenant in registry.TENANT_DATA_GATEWAY.find_all():
         ti = TenantInfo(tenant=tenant.name,
                         access_keys=list(tenant.access_keys),
@@ -30,9 +31,9 @@ def all_tenants():
     return None
 
 
-
 @access_key_and_tenant_required
 def new_bucket_for_tenant(bucket_access_key: BucketAccessKey, **kwargs) -> TenantInfo:
+    """create a new bucket for a tenant"""
     tenant = kwargs['tenant']
     tenant.new_bucket(bucket_access_key.bucket)
     registry.TENANT_DATA_GATEWAY.save(tenant)
@@ -41,9 +42,9 @@ def new_bucket_for_tenant(bucket_access_key: BucketAccessKey, **kwargs) -> Tenan
                       buckets=list(tenant.buckets))
 
 
-
 @access_key_and_tenant_required
 def tenant_by_access_key(tenant_access_key: TenantAccessKey, *args, **kwargs):
+    """find the tenant information by an access key"""
     tenant = kwargs['tenant']
     ti = TenantInfo(tenant=tenant.name,
                     access_keys=list(tenant.access_keys),
@@ -53,6 +54,7 @@ def tenant_by_access_key(tenant_access_key: TenantAccessKey, *args, **kwargs):
 
 @access_to_bucket_required
 def add_item_to_bucket(bucket_item, **kwargs):
+    """insert item into a bucket"""
     bucket = kwargs['bucket']
     item = bucket.prepare_item(bucket_item.item_key, bucket_item.data)
     registry.BUCKET_DATA_GATEWAY.save(item)
@@ -60,13 +62,14 @@ def add_item_to_bucket(bucket_item, **kwargs):
 
 @access_to_bucket_required
 def remove_item_from_bucket(bucket_item_key, **kwargs):
+    """remove an item from a bucket. """
     bucket = kwargs['bucket']
     registry.BUCKET_DATA_GATEWAY.delete(bucket.id, bucket_item_key.item_key)
 
 
-
 @access_to_bucket_required
 def item_in_bucket(bucket_item_key, **kwargs):
+    """get an item from a bucket"""
     bucket = kwargs['bucket']
     item = registry.BUCKET_DATA_GATEWAY.one_in_bucket(
         bucket.id, bucket_item_key.item_key)
@@ -78,7 +81,8 @@ def item_in_bucket(bucket_item_key, **kwargs):
 
 
 @access_to_bucket_required
-def all_items_in_bucket(bucket_access_key: BucketAccessKey, **kwargs) -> ItemInfo:
+def all_items_in_bucket(bucket_access_key: BucketAccessKey, **kwargs) -> Generator[ItemInfo, None, None]:
+    """iterate the items in the bucket"""
     bucket = kwargs['bucket']
     for item in registry.BUCKET_DATA_GATEWAY.all_in_bucket(bucket.id):
         bi = ItemInfo(bucket.key, item.key, item.data)
